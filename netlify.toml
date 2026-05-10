@@ -1,0 +1,17 @@
+[build]
+  command = "bash build.sh"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[[redirects]]
+  from = "/tiles/rotherwas/*"
+  to = "/tiles/rotherwas/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/docs"
+  to = "/docs.html"
+  status = 200
