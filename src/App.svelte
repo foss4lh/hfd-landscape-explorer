@@ -8,6 +8,7 @@
 	import YearRangeSlider from './lib/YearRangeSlider.svelte';
 	import Combobox from './lib/Combobox.svelte';
 	import DatasetList from './lib/DatasetList.svelte';
+	import { PMTilesRasterSource } from 'ol-pmtiles';
 
 	let olMap = $state(null);
 	let z=$state(10.5), c=$state(fromLonLat([-2.72, 52.08]));
@@ -57,9 +58,16 @@
 		}
 	];
 
+    // Whitby tithe map PMTiles source
+    const whitbyTithe = new PMTilesRasterSource({
+        url: 'whitby-tithe.pmtiles',
+        attributions: '© David Lovelace Archive — Whitby Tithe Map (ECW)',
+        tileSize: 256
+    });
+
     const datasets = [
-        {id:'rotherwas', name:'Rotherwas (demo)', year:1947, region:'Hereford', parish:'Rotherwas', source:new XYZ({url:'/tiles/rotherwas/{z}/{x}/{-y}.png',maxZoom:16,minZoom:10})},
-        {id:'tithe', name:'Hereford Tithe', year:1840, region:'Hereford', parish:'Hereford City', source:null},
+        {id:'rotherwas', name:'Rotherwas (demo)', year:1947, region:'Hereford', parish:'Rotherwas', source:new XYZ({url:'tiles/rotherwas/{z}/{x}/{-y}.png',maxZoom:16,minZoom:10})},
+        {id:'tithe', name:'Whitby Tithe (PMTiles demo)', year:1947, region:'Hereford', parish:'Whitby', source: whitbyTithe, center:[-2.439,52.206], zoom:12},
         {id:'aero', name:'Aerofilms', year:1928, region:'Herefordshire', parish:'', source:null}
     ];
 
@@ -88,15 +96,15 @@
 		if (!zoomToDataset) return;
 		const ds = datasets.find(d => d.id === id);
 		if (ds && ds.source) {
-			c = fromLonLat([-2.72, 52.08]);
-			z = 12;
+			c = fromLonLat(ds.center || [-2.72, 52.08]);
+			z = ds.zoom || 12;
 		}
 	}
 
 	function onZoom(ds) {
 		if (!ds.source || !zoomToDataset) return;
-		c = fromLonLat([-2.72, 52.08]);
-		z = 12;
+		c = fromLonLat(ds.center || [-2.72, 52.08]);
+		z = ds.zoom || 12;
 	}
 
 	// Add scale bar control once the map is ready
